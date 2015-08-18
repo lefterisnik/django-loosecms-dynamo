@@ -1,0 +1,79 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-11-05 13:47+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:9 models.py:22
+msgid "title"
+msgstr "τίτλος"
+
+#: models.py:10
+msgid "Give the name of the rss manager."
+msgstr "Δώστε το όνομα το διαχειριστή των rss."
+
+#: models.py:15 models.py:37
+msgid "published"
+msgstr "δημοσίευση"
+
+#: models.py:23
+msgid "Give the name of the rss."
+msgstr "Δώστε το όνομα του rss."
+
+#: models.py:24
+msgid "slug"
+msgstr "ετικέτα"
+
+#: models.py:25
+msgid "Give the slug of the rss"
+msgstr "Δώστε την ετικέτα του rss."
+
+#: models.py:26
+msgid "feed"
+msgstr "διεύθυνση τροφοδότησης"
+
+#: models.py:27
+msgid "Give the feed url"
+msgstr "Δώστε την διεύθυνση τροφοδότησης περιεχομένου του rss."
+
+#: models.py:28
+msgid "timeout"
+msgstr "διάρκεια προσωρινής μνήμης"
+
+#: models.py:29
+msgid ""
+"Give the timeout to reload rss. If the values is 0, each time will begin "
+"request to feed url to download rss content(adding delaying)."
+msgstr ""
+"Δώστε το χρόνο σε δευτερόλεπτα μετά τα οποία θα επειχειρείτε ανανέωση του "
+"περιεχομένου του rss. Εάν η τιμή είναι 0, τότε κάθε φορά θα επειχειρείτε "
+"ανάγνωση από την πηγή."
+
+#: models.py:31
+msgid "image"
+msgstr "εικόνα"
+
+#: models.py:33
+msgid "manager"
+msgstr "διαχειριστής"
+
+#: models.py:34
+msgid "Select the rss manager."
+msgstr "Επιλέξτε το διαχειριστή των rss."
+
+#: models.py:35
+msgid "order"
+msgstr "σειρά εμφάνισης"

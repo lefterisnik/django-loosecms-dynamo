@@ -1,0 +1,9 @@
+#Some files
+*~
+*.pyc
+*.idea
+*.egg-info
+
+#Some dirs
+dist
+migrations

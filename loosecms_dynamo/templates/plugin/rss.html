@@ -1,0 +1,34 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>
+    var rss = jQuery|| {};
+    rss.jQuery = jQuery.noConflict(true);
+</script>
+<ul class="nav nav-tabs" role="tablist">
+    {% for rss in rsss %}
+        {% if forloop.first %}
+            <li class="active"><a href="#{{ rss.slug }}" role="tab" data-toggle="tab">{{ rss }}</a></li>
+        {% else %}
+            <li><a href="#{{ rss.slug }}" role="tab" data-toggle="tab">{{ rss }}</a></li>
+        {% endif %}
+    {% endfor %}
+</ul>
+<div class="tab-content">
+    {% for rss in rsss %}
+        {% if forloop.first %}
+        <div role="tabpanel" class="tab-pane active" id="{{ rss.slug }}">
+        {% else %}
+        <div role="tabpanel" class="tab-pane " id="{{ rss.slug }}">
+        {% endif %}
+            <div id="{{ rss.slug }}"></div>
+            <script>
+                (function($) {
+                    $(document).ready(function() {
+                        $.get( "rss/{{ rss.slug }}", function( data ) {
+                            $( "#{{ rss.slug }}" ).html( data );
+                        });
+                    });
+                }) (rss.jQuery);
+            </script>
+        </div>
+    {% endfor %}
+</div>
