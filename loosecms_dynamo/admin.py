@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from .models import DynamoManager, Dynamo
+from .models import DynamoManager, Dynamo, DynamoPluginManager
+from .plugin import DynamoPlugin
 import utils
 
 
@@ -15,16 +16,14 @@ class DynamoInline(admin.StackedInline):
 
 
 class DynamoManagerAdmin(admin.ModelAdmin):
-    prepopulated_fields = {
-        'name': ('title', ),
-        'table_name': ('name', ),
-    }
+    readonly_fields = ('name', )
     inlines = [
         DynamoInline,
     ]
 
 
 admin.site.register(DynamoManager, DynamoManagerAdmin)
+admin.site.register(DynamoPluginManager, DynamoPlugin)
 admin.site.register(Dynamo, DynamoAdmin)
 
 utils.register_dynamic_plugin_admin(admin.site)

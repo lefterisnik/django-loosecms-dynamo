@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
-from .models import DynamoManager, Dynamo
+from .models import DynamoManager, DynamoPluginManager
+from loosecms.forms import PluginForm
 
 
+class DynamoPluginManagerForm(PluginForm):
 
-#class RssManagerForm(PluginForm):
-
-#    class Meta(PluginForm.Meta):
-#        model = RssManager
+    class Meta(PluginForm.Meta):
+        model = DynamoPluginManager
