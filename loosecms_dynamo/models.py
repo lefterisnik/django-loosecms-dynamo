@@ -3,7 +3,6 @@ from django.db import models
 from django.db.models.signals import post_save, post_init, pre_init, class_prepared
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
-from django.core.management import g
 
 from .signals import *
 from .fields import *
