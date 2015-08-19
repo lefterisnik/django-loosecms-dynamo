@@ -13,7 +13,9 @@ import types
 
 
 def create_db_table(model, fields):
-    if connection.vendor == 'mysql':
+    with connection.schema_editor() as schema_editor:
+        schema_editor.create_model(model)
+    '''if connection.vendor == 'mysql':
         cursor = connection.cursor()
         db_table = model._meta.db_table
         db_fields = "`plugin_ptr_id` int(11) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`plugin_ptr_id`),"
@@ -25,7 +27,7 @@ def create_db_table(model, fields):
 
         query = "CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=InnoDB  DEFAULT CHARSET=utf8;" % (db_table, db_fields)
         cursor.execute(query)
-        return
+        return'''
 
 
 def register_dynamic_plugin_admin(admin_site):
@@ -97,6 +99,7 @@ def register_dynamic_model(dynamo_manager, fields):
     }
 
     class Meta:
+        managed=False
         if dynamo_manager.verbose_name:
             verbose_name = dynamo_manager.verbose_name
         if dynamo_manager.verbose_name_plural:
