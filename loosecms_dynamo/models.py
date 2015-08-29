@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.db.models.signals import post_save, post_delete, class_prepared
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
+from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import post_save, post_delete, pre_save
+
 
 from .signals import *
 from .fields import *
 
 from loosecms.models import Plugin
-
-class_prepared.connect(model_class_prepared, weak=False)
 
 
 def get_default():
@@ -46,6 +44,8 @@ class Dynamo(models.Model):
                             help_text=_('Give the slug of the header'))
     type = models.CharField(_('type'), max_length=50, choices=ANSWER_TYPES,
                             help_text=_('Select the type of the field'))
+    required = models.BooleanField(_('required'), default=True,
+                                   help_text=_('Check this box if you want the field to be required'))
     manager = models.ForeignKey(DynamoManager, verbose_name=_('manager'),
                                 help_text=_('Select the dynamo manager.'))
     ctime = models.DateTimeField(auto_now_add=True)
@@ -59,6 +59,8 @@ class Dynamo(models.Model):
 
     def get_field(self):
         kwargs = {}
+        kwargs['blank'] = not self.required
+        kwargs['verbose_name'] = self.title
 
         try:
             return ANSWER_FIELDS[self.type](**kwargs)
@@ -85,5 +87,6 @@ class DynamoPluginManager(Plugin):
 
 post_save.connect(dynamomanager_post_save, sender=DynamoManager)
 post_delete.connect(dynamomanager_post_delete, sender=DynamoManager)
+pre_save.connect(dynamo_pre_save, sender=Dynamo)
 post_save.connect(dynamo_post_save, sender=Dynamo)
 post_delete.connect(dynamo_post_delete, sender=Dynamo)

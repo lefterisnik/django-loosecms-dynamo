@@ -25,5 +25,3 @@ class DynamoManagerAdmin(admin.ModelAdmin):
 admin.site.register(DynamoManager, DynamoManagerAdmin)
 admin.site.register(DynamoPluginManager, DynamoPlugin)
 admin.site.register(Dynamo, DynamoAdmin)
-
-utils.register_dynamic_plugin_admin(admin.site)

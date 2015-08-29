@@ -1,18 +1,49 @@
 # -*- coding: utf-8 -*-
-from django.contrib import admin
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import models
 from django.apps import apps
-from django.db import connection, ProgrammingError, OperationalError
-
 from .models import *
 
 import utils
 
-# Constants to check that models are loaded in registry
-DEPEND = ['Dynamo', 'DynamoManager']
-APP_NAME = 'loosecms_dynamo'
-ALREADY_PREPARED = {}
+
+def dynamomanager_post_save(sender, instance, created, **kwargs):
+    """
+    Exam if model exist and if exist delete definition and make a new one, otherwise we create the model
+    :param sender:
+    :param instance:
+    :param created:
+    :param kwargs:
+    :return: None
+    """
+    model_name = instance.name
+
+    if created:
+        # Force our response model to regenerate
+        dynamic_model = utils.register_dynamic_model(instance)
+
+        # Create a new table if it's missing
+        utils.create_db_table(dynamic_model)
+
+        # Register the model in the admin
+        utils.reregister_in_admin(dynamic_model, None, True)
+    else:
+        # Get the current model if exist
+        dynamic_model = utils.get_dynamic_model(model_name)
+
+        # Get all fields associate with this model
+        dynamo_fields = instance.dynamo_set.all()
+
+        # Force unregister current model and from admin
+        utils.unregister_dynamic_model(model_name)
+        utils.unregister_in_admin(dynamic_model)
+
+        # Check if model is deleleted
+        utils.check_model_exist(model_name)
+
+        # Create the new model with the new attributes
+        dynamic_model = utils.register_dynamic_model(instance, dynamo_fields)
+
+        # Reregister the model in admin
+        utils.reregister_in_admin(dynamic_model, None)
 
 
 def dynamomanager_post_delete(sender, instance, **kwargs):
@@ -29,74 +60,23 @@ def dynamomanager_post_delete(sender, instance, **kwargs):
     # Get model if exist
     dynamic_model = utils.get_dynamic_model(model_name)
 
-    # Delete the table in database
-    utils.rm_db_table(dynamic_model)
+    if dynamic_model:
+        # Delete the table in database
+        utils.rm_db_table(dynamic_model)
 
-    # Force unregister model
-    utils.unregister_dynamic_model(model_name)
-
-    # Unregister the model in the admin
-    utils.unregister_in_admin(admin.site, dynamic_model)
-
-
-def dynamomanager_post_save(sender, instance, created, **kwargs):
-    """
-    Exam if model exist and if exist delete definition and make a new one, otherwise we create the model
-    :param sender:
-    :param instance:
-    :param created:
-    :param kwargs:
-    :return: None
-    """
-    if created:
-        model_name = instance.name
-        # Force unregister model if exist
+        # Force unregister model
         utils.unregister_dynamic_model(model_name)
 
-        # Force our response model to regenerate
-        dynamic_model = utils.register_dynamic_model(instance)
+        # Check if model is deleled
+        utils.check_model_exist(model_name)
 
-        # Create a new table if it's missing
-        utils.create_db_table(dynamic_model)
-
-        # Reregister the model in the admin
-        utils.reregister_in_admin(admin.site, dynamic_model, None, True)
+        # Unregister the model in the admin
+        utils.unregister_in_admin(dynamic_model)
 
 
-def dynamo_post_save(sender, instance, created, **kwargs):
+def dynamo_pre_save(sender, instance, **kwargs):
     """
-    Add or Edit field from model
-    :param sender:
-    :param instance:
-    :param created:
-    :param kwargs:
-    :return: None
-    """
-    if created:
-        model_name = instance.manager.name
-        # Get model if exist
-        dynamic_model = utils.get_dynamic_model(model_name)
-
-        # Get field
-        dynamic_field = instance.get_field()
-
-        # Update model with new field
-        setattr(dynamic_model, instance.name, dynamic_field)
-
-        # Add name and column to field
-        dynamic_field.name = instance.name
-        dynamic_field.column = instance.name
-
-        # Add new field to model
-        utils.add_db_field(dynamic_model, dynamic_field)
-
-        # Reregister the model in the admin
-        utils.reregister_in_admin(admin.site, dynamic_model, None, False)
-
-
-def dynamo_post_delete(sender, instance, **kwargs):
-    """
-    Delete field from model
+    Edit field for model
     :param sender:
     :param instance:
     :param created:
@@ -104,61 +84,90 @@ def dynamo_post_delete(sender, instance, **kwargs):
     :return: None
     """
     model_name = instance.manager.name
+
     # Get model if exist
     dynamic_model = utils.get_dynamic_model(model_name)
+    if dynamic_model:
+        # Get field
+        new_dynamic_field = instance.get_field()
 
-    # Get field
-    dynamic_field = instance.get_field()
+        # Get old field name
+        try:
+            old_instance = sender.objects.get(pk=instance.pk)
+        except sender.DoesNotExist:
+            return
 
-    # Add name and column to field
-    dynamic_field.name = instance.name
-    dynamic_field.column = instance.name
+        old_dynamic_field = dynamic_model._meta.get_field(old_instance.name)
 
-    # Remove field from model class
-    dynamic_model._meta.fields = tuple(x for x in dynamic_model._meta.fields if x.name != dynamic_field.name)
+        # Retrieve and remove old field from model
+        dynamic_model._meta.local_fields.remove(old_dynamic_field)
 
-    # Remove field from model db
-    utils.rm_db_field(dynamic_model, dynamic_field)
+        apps.clear_cache()
 
-    # Reregister the model in the admin
-    utils.reregister_in_admin(admin.site, dynamic_model, None, False)
+        # Re-add the chancged field in the model
+        new_dynamic_field.contribute_to_class(dynamic_model, instance.name)
+
+        # Alter new field to db
+        utils.alter_db_field(dynamic_model, old_dynamic_field, new_dynamic_field)
+
+        # Reregister the model in the admin
+        utils.reregister_in_admin(dynamic_model, None)
 
 
-def model_class_prepared(sender, **kwargs):
+def dynamo_post_save(sender, instance, created, **kwargs):
     """
-    Builds all existing dynamic models at once.
+    Process adding field for model
+    :param sender:
+    :param instance:
+    :param created:
+    :param kwargs:
+    :return: None
+    """
+    model_name = instance.manager.name
+
+    # Get model if exist
+    dynamic_model = utils.get_dynamic_model(model_name)
+    if dynamic_model:
+        # Get field
+        dynamic_field = instance.get_field()
+        if created:
+            # Add new field to dynamic model
+            dynamic_field.contribute_to_class(dynamic_model, instance.name)
+
+            # Add new field to db
+            utils.add_db_field(dynamic_model, dynamic_field)
+
+            # Reregister the model in the admin
+            utils.reregister_in_admin(dynamic_model, None, False)
+
+
+def dynamo_post_delete(sender, instance, **kwargs):
+    """
+    Delete field from model
     :param sender:
     :param instance:
     :param kwargs:
     :return: None
     """
-    sender_name = sender._meta.object_name
-    sender_app_name = sender._meta.app_label
-    ALREADY_PREPARED[sender_name] = sender
-    if sender_app_name == APP_NAME and all([x in ALREADY_PREPARED for x in DEPEND]) and sender_name in DEPEND:
-        # To avoid circular imports, the model is retrieved from the sender
-        LocalDynamoManager = ALREADY_PREPARED[DEPEND[1]]
-        LocalDynamo = ALREADY_PREPARED[DEPEND[0]]
+    model_name = instance.manager.name
 
-        # Fetch all objects!!! Filter queryset is not possibly as throw an exception
-        # django.core.exceptions.AppRegistryNotReady
-        # Django docs: https://docs.djangoproject.com/en/1.8/ref/applications/#troubleshooting
-        # Executing database queries with the ORM at import time in models modules will also trigger this exception.
-        # The ORM cannot function properly until all models are available.
-        dynamo_managers = LocalDynamoManager.objects.all()
-        dynamo_fields = LocalDynamo.objects.all()
+    # Get old model if exist
+    dynamic_model = utils.get_dynamic_model(model_name)
 
-        try:
-            for dynamo_manager in dynamo_managers:
-                fields = []
-                for dynamo_field in dynamo_fields:
-                    if dynamo_field.manager == dynamo_manager:
-                        fields.append(dynamo_field)
-                dynamic_model = utils.register_dynamic_model(dynamo_manager, fields)
+    # Get field
+    dynamic_field = instance.get_field()
+    dynamic_field.column = instance.name
 
-                # Create the table if necessary, shouldn't be necessary anyway
-                if dynamic_model:
-                    utils.create_db_table(dynamic_model, fields)
-        except (ProgrammingError, OperationalError) as e:
-            # The tables are not to database, so we return here to continue the migrate command
-            return
+    # Remove field from model db
+    utils.rm_db_field(dynamic_model, dynamic_field)
+
+    # Remove field from model class
+    dynamic_field = dynamic_model._meta.get_field(instance.name)
+
+    dynamic_model._meta.local_fields.remove(dynamic_field)
+
+    apps.clear_cache()
+
+    utils.reregister_in_admin(dynamic_model, None)
+
+
