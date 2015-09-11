@@ -27,21 +27,24 @@ class LooseCMSDynamoConfig(AppConfig):
         # Django docs: https://docs.djangoproject.com/en/1.8/ref/applications/#troubleshooting
         # Executing database queries with the ORM at import time in models modules will also trigger this exception.
         # The ORM cannot function properly until all models are available.
-        dynamo_managers = DynamoManager.objects.all()
+        try:
+            dynamo_managers = DynamoManager.objects.all()
 
-        for dynamo_manager in dynamo_managers:
-            dynamo_fields = Dynamo.objects.filter(manager=dynamo_manager)
-            try:
-                dynamic_model = utils.register_dynamic_model(dynamo_manager, dynamo_fields)
-                dynamic_models.append(dynamic_model)
+            for dynamo_manager in dynamo_managers:
+                dynamo_fields = Dynamo.objects.filter(manager=dynamo_manager)
+                try:
+                    dynamic_model = utils.register_dynamic_model(dynamo_manager, dynamo_fields)
+                    dynamic_models.append(dynamic_model)
 
-                # Create the table if necessary, shouldn't be necessary anyway
-                if dynamic_model:
-                    utils.create_db_table(dynamic_model)
-            except (ProgrammingError, OperationalError) as e:
-                # The tables are not to database, so we return here to continue the migrate command or
-                # the tables are in database
-                continue
+                    # Create the table if necessary, shouldn't be necessary anyway
+                    if dynamic_model:
+                        utils.create_db_table(dynamic_model)
+                except (ProgrammingError, OperationalError) as e:
+                    # The tables are not to database, so we return here to continue the migrate command or
+                    # the tables are in database
+                    continue
+        except (ProgrammingError, OperationalError) as e:
+            return
 
         # Register all dynamic models
         utils.reregister_in_admin(dynamic_models, None, initial=True)
