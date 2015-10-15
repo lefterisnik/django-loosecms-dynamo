@@ -8,72 +8,130 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-05 13:47+0200\n"
+"POT-Creation-Date: 2015-10-15 15:17+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:9 models.py:22
+#: apps.py:10
+msgid "Loose CMS Plugin - Dynamic Models"
+msgstr "Loose CMS Plugin - Δυναμικά Μοντέλα"
+
+#: models.py:22 models.py:78
 msgid "title"
 msgstr "τίτλος"
 
-#: models.py:10
-msgid "Give the name of the rss manager."
-msgstr "Δώστε το όνομα το διαχειριστή των rss."
-
-#: models.py:15 models.py:37
-msgid "published"
-msgstr "δημοσίευση"
-
 #: models.py:23
-msgid "Give the name of the rss."
-msgstr "Δώστε το όνομα του rss."
+msgid "Give the name of the dynamo manager."
+msgstr "Δώστε το όνομα του διαχειριστή των δυναμικών μοντέλων."
 
 #: models.py:24
+msgid "name"
+msgstr "όνομα"
+
+#: models.py:25
+msgid "Represent the name of the table in python."
+msgstr "Αναπαριστά το όνομα του πίνακα στην python"
+
+#: models.py:26
+msgid "verbose name"
+msgstr "λεπτομερές όνομα"
+
+#: models.py:27
+msgid ""
+"Give the name of the table which will appear in admin panel. If set to null "
+"will using the name field."
+msgstr ""
+"Δώστε το όνομα του πίνακα με το οποίο θα εμφανίζεται στην διαχείριση. Εάν "
+"μείνει κενό τότε θα χρησιμοποιηθεί αυτό του πεδίου όνομα."
+
+#: models.py:29
+msgid "verbose name plural"
+msgstr "λεπτομερές όνομα σε πληθυντικό αριθμό"
+
+#: models.py:30
+msgid ""
+"Give the name of the table which will appear in admin panel for the plural. "
+"If set to null will using the name field."
+msgstr ""
+
+#: models.py:37
+msgid "dynamic model manager"
+msgstr "Διαχειριστής δυναμικών μοντέλων"
+
+#: models.py:38
+msgid "dynamic model managers"
+msgstr "Διαχειριστές δυναμικών μοντέλων"
+
+#: models.py:45
+msgid "header title"
+msgstr "τίτλος επικεφαλίδας"
+
+#: models.py:46
+msgid "Give the name of the header."
+msgstr "Δώστε το όνομα της επικεφαλίδας."
+
+#: models.py:47
 msgid "slug"
 msgstr "ετικέτα"
 
-#: models.py:25
-msgid "Give the slug of the rss"
-msgstr "Δώστε την ετικέτα του rss."
+#: models.py:48
+msgid "Give the slug of the header"
+msgstr "Δώστε την ετικέτα της επικεφαλίδας."
 
-#: models.py:26
-msgid "feed"
-msgstr "διεύθυνση τροφοδότησης"
+#: models.py:49
+msgid "type"
+msgstr "τύπος"
 
-#: models.py:27
-msgid "Give the feed url"
-msgstr "Δώστε την διεύθυνση τροφοδότησης περιεχομένου του rss."
+#: models.py:50
+msgid "Select the type of the field"
+msgstr "Επιλέξτε το τύπο του πεδίου"
 
-#: models.py:28
-msgid "timeout"
-msgstr "διάρκεια προσωρινής μνήμης"
+#: models.py:51
+msgid "required"
+msgstr "απαραίτητο"
 
-#: models.py:29
-msgid ""
-"Give the timeout to reload rss. If the values is 0, each time will begin "
-"request to feed url to download rss content(adding delaying)."
-msgstr ""
-"Δώστε το χρόνο σε δευτερόλεπτα μετά τα οποία θα επειχειρείτε ανανέωση του "
-"περιεχομένου του rss. Εάν η τιμή είναι 0, τότε κάθε φορά θα επειχειρείτε "
-"ανάγνωση από την πηγή."
+#: models.py:52
+msgid "Check this box if you want the field to be required"
+msgstr "Επιλέξτε εάν επιθυμείτε το πεδίο να είναι απαραίτητο"
 
-#: models.py:31
-msgid "image"
-msgstr "εικόνα"
-
-#: models.py:33
+#: models.py:53
 msgid "manager"
 msgstr "διαχειριστής"
 
-#: models.py:34
-msgid "Select the rss manager."
-msgstr "Επιλέξτε το διαχειριστή των rss."
+#: models.py:54
+msgid "Select the dynamo manager."
+msgstr "Επιλέξτε το διαχειριστή των δυναμικών μοντέλων."
 
-#: models.py:35
-msgid "order"
-msgstr "σειρά εμφάνισης"
+#: models.py:59
+msgid "published"
+msgstr "δημοσίευση"
+
+#: models.py:79
+msgid "Give some title"
+msgstr "Δώστε ένα τίτλο"
+
+#: models.py:82
+msgid "content type"
+msgstr ""
+
+#: models.py:84
+msgid "Select the table that contain the data."
+msgstr "Επιλέξτε τον πίνακα που περιέχει τα δεδομένα."
+
+#: models.py:85
+msgid "responsive"
+msgstr "αποκρητικός"
+
+#: models.py:86
+msgid "Check this box if you like the table to be fully responsive."
+msgstr ""
+
+#: plugin.py:12
+msgid "Dynamic model manager"
+msgstr "Διαχειριστής δυναμικών μοντέλων"

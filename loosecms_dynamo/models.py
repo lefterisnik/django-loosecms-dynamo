@@ -33,6 +33,10 @@ class DynamoManager(models.Model):
 
     utime = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = _('dynamic model manager')
+        verbose_name_plural = _('dynamic model managers')
+
     def __unicode__(self):
         return self.title
 
@@ -69,6 +73,8 @@ class Dynamo(models.Model):
 
 
 class DynamoPluginManager(Plugin):
+    default_type = 'DynamoManagerPlugin'
+
     title = models.CharField(_('title'), max_length=200,
                              help_text=_('Give some title'))
     limit_choices_to = Q(app_label='loosecms_dynamo') & ~Q(model='Dynamo') & ~Q(model='DynamoManager') &\
